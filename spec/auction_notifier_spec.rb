@@ -7,10 +7,14 @@ describe 'Auction Notifier App' do
   end
 
   describe 'users' do    
-    before { @user = User.new(email: "email@example.com") }
+    before { @user = User.new(email: "email@example.com",
+                              password: "password",
+                              password_confirmation: "password") }
     subject { @user }
 
     it { should respond_to(:email) }
+    it { should respond_to(:password) }
+    it { should respond_to(:password_confirmation) }
 
     it { should be_valid }
 
@@ -29,10 +33,22 @@ describe 'Auction Notifier App' do
 
     describe "when email is taken" do
       before do 
-        same_user = User.new(email: "email@example.com")
+        same_user = User.new(email: "email@example.com",
+                             password: "password",
+                             password_confirmation: "password")
         same_user.save
       end
 
+      it { should_not be_valid }
+    end
+    
+    describe "when password is not present" do
+      before { @user.password = " " }
+      it { should_not be_valid }
+    end
+    
+    describe "when password does not match confirmation" do
+      before { @user.password_confirmation = " " }
       it { should_not be_valid }
     end
   end
