@@ -1,3 +1,20 @@
+configure :production do
+  use Rack::SSL
+  use Rack::Session::Cookie
+  use Rack::MethodOverride
+  
+  set :session_secret, ENV['SESSION']
+  set :method_override, true
+end
+
+configure :development do
+  use Rack::Session::Cookie
+  use Rack::MethodOverride
+  
+  set :method_override, true
+  set :raise_errors, true
+end
+
 class User
   include DataMapper::Resource
 
@@ -16,6 +33,29 @@ end
 
 DataMapper.finalize
 
+before do
+  redirect '/login' unless session[:user] or request.path == '/login'
+end
+
 get '/' do
-  "Hello World!"
+  erb :index
+end
+
+get '/login' do
+  erb :login
+end
+
+post '/login' do
+  user = User.first(email: params[:email])
+  if user.password == params['password']
+    session[:user] = user.email
+    redirect '/'
+  else
+    redirect '/login'
+  end
+end
+
+delete '/logout' do
+  session[:user] = nil
+  redirect '/login'
 end

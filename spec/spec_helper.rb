@@ -9,6 +9,7 @@ set :environment, :test
 set :run, false
 set :raise_errors, true
 set :logging, false
+set :views => File.join(File.dirname(__FILE__), "..", "views")
 
 DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/db/test.db")
 

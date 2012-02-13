@@ -2,8 +2,27 @@ require 'spec_helper'
 
 describe 'Auction Notifier App' do
   it "should respond to GET" do
-    get '/'
+    get '/login'
     last_response.should be_ok
+  end
+  
+  it "should redirect to the login page when not logged in" do
+    get '/'
+    follow_redirect!
+    last_request.path.should == '/login'
+  end
+  
+  it "should log the user in and out" do
+    User.create(email: "email@example.com",
+                password: "password",
+                password_confirmation: "password")
+    post '/login', {email: "email@example.com", password: "password"}
+    follow_redirect!
+    last_request.path.should == '/'
+    
+    delete '/logout'
+    follow_redirect!
+    last_request.path.should == '/login'
   end
 
   describe 'users' do    
